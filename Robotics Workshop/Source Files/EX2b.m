@@ -1,0 +1,137 @@
+%% Final test
+
+% New York Institute of Technology
+% NYIT Academy Summer Camp 2018
+% Author: Jonathan Lopez Christopher Shin
+
+% RWTH - Mindstorms NXT Toolbox: http://www.mindstorms.rwth-aachen.de
+
+%% Verify that the RWTH - Mindstorms NXT toolbox is installed.
+if verLessThan('RWTHMindstormsNXT', '3.00');
+    error('This program requires the RWTH - Mindstorms NXT Toolbox version 3.00 or greater. Go to http://www.mindstorms.rwth-aachen.de and follow the installation instructions!');
+end%if
+
+%% Make sure all connections are closed before new connection
+COM_CloseNXT all
+clear all
+close all
+
+%% Connection with the brick via USB
+
+h = COM_OpenNXT();
+COM_SetDefaultNXT(h);
+
+%%---You must submit the all the code below this line for each exercise question---%%
+
+%% Constants 
+
+Distance1  = 2300;
+Distance2  = 1000;
+Distance3  = 400;
+Distance5  = 400;
+Ports     = [MOTOR_B; MOTOR_C;];  % motors
+Speed     = 60;
+TurnTicks1 = 190;
+TurnTicks2 = 380;
+TurnSpeed1 = 60;
+TurnSpeed2 = 240;
+
+Distance4  = 1000;
+PortsA     = [MOTOR_A];  % motors
+SpeedA     = 100;
+
+%% action mStraight1
+
+mStraight1                   = NXTMotor(Ports);
+mStraight1.Power             = Speed;
+mStraight1.TachoLimit        = Distance1;
+
+%% action mTurn1
+
+mTurn1                      = NXTMotor(Ports(2)); % turn motor C first...
+mTurn1.Power                = TurnSpeed1;
+mTurn1.TachoLimit           = TurnTicks1;
+%% action mStraight2
+
+mStraight2                   = NXTMotor(Ports);
+mStraight2.Power             = Speed;
+mStraight2.TachoLimit        = Distance2;
+%% action mTurn2
+
+mTurn2                      = NXTMotor(Ports(2)); % turn motor C first...
+mTurn2.Power                = TurnSpeed1;
+mTurn2.TachoLimit           = TurnTicks2;
+
+%% action mBack
+
+mBack                   = mStraight2;   %same speed and distance...
+mBack.Power             = -mStraight2.Power;   %but different direction
+mBack.TachoLimit        = Distance2;
+%% action mStraight3
+
+mStraight3                   = NXTMotor(Ports);
+mStraight3.Power             = Speed;
+mStraight3.TachoLimit        = Distance3;
+%% action mStraight4
+
+mStraight4                   = NXTMotor(Ports);
+mStraight4.Power             = Speed;
+mStraight4.TachoLimit        = Distance5;
+%% action mTurn3
+
+mTurn3                      = NXTMotor(PortsA); % turn motor A first...
+mTurn3.Power                = - SpeedA;
+mTurn3.TachoLimit           = Distance4;
+%% Need to ensure all motors are stopped initially
+
+mStraight1.Stop('off');
+mStraight2.Stop('off');
+mStraight3.Stop('off');
+
+%% Sequence of actions
+
+
+%% Move forward and stop 1
+
+    mStraight1.SendToNXT();
+    mStraight1.WaitFor();
+    
+%% Turn1
+
+    mTurn1.SendToNXT();
+    mTurn1.WaitFor();
+
+%% Move forward and stop 2 
+
+    mStraight2.SendToNXT();
+    mStraight2.WaitFor();
+%% Move back bean bag
+
+    mBack.SendToNXT();
+    mBack.WaitFor();
+%% Move forward and stop 3 bean bag
+
+    mStraight3.SendToNXT();
+    mStraight3.WaitFor();
+
+%% Turn2
+
+    mTurn2.SendToNXT();
+    mTurn2.WaitFor();
+%% Move forward cube
+
+    mStraight4.SendToNXT();
+    mStraight4.WaitFor();
+%% Turn3 arm
+
+    mTurn3.SendToNXT();
+    mTurn3.WaitFor();
+
+%% Shut down all motors again
+mStraight1.Stop('off');
+mStraight2.Stop('off');
+mStraight3.Stop('off');
+mStraight4.Stop('off');
+
+%% Close connection
+COM_CloseNXT(h);
